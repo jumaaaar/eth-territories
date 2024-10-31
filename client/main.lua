@@ -1,13 +1,9 @@
 
 
 local ESX = exports['es_extended']:getSharedObject()
-local claimPos, closestTerritory, halfwayAlert, captureBlip = nil, nil, false, nil
-local CircleZone = CircleZone
-local territoryZone = nil
+local closestTerritory = nil
 local playerCounts = {} 
 local blipTable = {}
-local insideTerritory = false
-
 
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler("esx:playerLoaded", function(xPlayer)
@@ -36,7 +32,7 @@ AddEventHandler('eth-territories:Capture', function(data)
         while captureDuration > 0 do
             Wait(1000)
 
-            captureDuration = captureDuration - 1000  -- Decrement by 1 second
+            captureDuration = captureDuration - 1000 
 
             local secondsRemaining = math.floor(captureDuration / 1000)
             lib.showTextUI('Capturing... ' .. secondsRemaining .. ' seconds remaining', {
@@ -64,7 +60,6 @@ function CreateMapBlips()
             local gang = dbTerritory[k].gang
             local radiusBlip = AddBlipForRadius(v.capture.location, v.radius or 100.0)
 
-            -- Create a blip for the territory
             local blip = AddBlipForCoord(v.capture.location.x, v.capture.location.y, v.capture.location.z)
             SetBlipSprite(blip, 303)
             SetBlipScale(blip, 0.6)
@@ -74,7 +69,6 @@ function CreateMapBlips()
             AddTextComponentString(v['label'])
             EndTextCommandSetBlipName(blip)
 
-            -- Set the blip color based on gang ownership
             print(GetGangBlipColor(gang))
             if gang then
                 SetBlipColour(radiusBlip, GetGangBlipColor(gang))
@@ -84,7 +78,6 @@ function CreateMapBlips()
 
             SetBlipAlpha(radiusBlip, 128)
 
-            -- Create the territory zone with `lib.zones.sphere`
             local isInsideZone = false
             local territoryZone = lib.zones.sphere({
                 coords = v.capture.location,
@@ -100,12 +93,10 @@ function CreateMapBlips()
                             zone = k,
                             counts = playerCounts
                         })
-
-                        -- Listen for "E" key press to capture the territory
                         Citizen.CreateThread(function()
                             while isInsideZone do
-                                Citizen.Wait(0) -- Short wait for responsiveness
-                                if IsControlJustPressed(0, 38) then -- 38 is the key code for "E"
+                                Citizen.Wait(0) 
+                                if IsControlJustPressed(0, 38) then 
                                     TriggerServerEvent('eth-territories:CaptureStart' , k)
                                     lib.hideTextUI()
                                     break
@@ -143,44 +134,6 @@ exports('GetClosestTerritory' , GetClosestTerritory)
 RegisterNetEvent('eth-territories:GlobalBlipAlert')
 AddEventHandler('eth-territories:GlobalBlipAlert', GlobalBlipAlert)
 
-
--- local captureLimit = 0
-
--- CreateThread(function()
--- 	while true do
--- 		local sleep = 500
--- 		local ped = PlayerPedId()
--- 		local coords = GetEntityCoords(ped)
--- 		for k, v in pairs(Config.Territories) do
--- 			local dist = #(coords - v['capture']['location'])
--- 			if dist <= 1.0 then
--- 					sleep = 0
--- 					ESX.DrawText3D(v['capture']['location'].x, v['capture']['location'].y, v['capture']['location'].z, '[~b~E~w~] ' ..'Capture '..v.label)
--- 					if IsControlJustReleased(0, 38) then
--- 						if (GetGameTimer() - captureLimit) < 3000 then 
--- 							exports['es_extended']:Notify('error', 5000, 'You must wait '..(3 - math.floor((GetGameTimer() - captureLimit) / 1000))..' seconds', 'RATE LIMIT')
--- 						else
---                             if (not IsPedArmed(PlayerPedId(), 4)) then
---                                 exports['es_extended']:Notify('error', 5000, 'You must have a firearm to begin the capture.')
---                             else
---                                 TriggerServerEvent('eth-territories:CaptureStart' , closestTerritory)
---                             end
-
--- 						end
--- 						captureLimit = GetGameTimer()
--- 					end
--- 			elseif dist <= 5.0 then
--- 				sleep = 0
--- 				ESX.DrawMarker(v['capture']['location'], 255, 255, 255, 150)
--- 			end 
--- 		end
--- 		Wait(sleep)
--- 	end
--- end)
-
-
-
-
 RegisterNetEvent('eth-territories:updateMap')
 AddEventHandler('eth-territories:updateMap', function(territoryName,gangName)
     local dbTerritory = lib.callback.await('eth-territories:getTerritories', false)
@@ -208,7 +161,6 @@ AddEventHandler('playerDropped', function(reason)
 end)
 
 AddEventHandler('esx:onPlayerDeath', function(data)
-    -- Get player information
     local playerId = GetPlayerServerId(PlayerId())
     local playerPed = PlayerPedId()
     local playerPos = GetEntityCoords(playerPed)

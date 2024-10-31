@@ -12,13 +12,22 @@ function GetGangBlipColor(playerGang)
     return 0
 end
 
-RegisterNetEvent('eth-gangs:WeazelNews', function(title, message, duration)
+RegisterNetEvent('eth-territories:WeazelNews', function(title, message, duration)
 	ESX.Scaleform.ShowBreakingNews(title, message, bottom, duration)
 end)
 
-function Notification(label, msg, duration, type)
-    exports['cfx-hu-notify']:Custom({style = type, duration = duration, title = label, message = msg, sound = false})
+function Notification(title, msg, duration, type)
+    lib.notify({
+        title = label,
+        description = msg,
+        type = type,
+        duration = duration
+    })
 end
+
+RegisterNetEvent('eth-territories:Notify', function(type, duration, msg)
+	Notification("TERRITORIES", msg, duration, type)
+end)
 
 function GlobalBlipAlert(territoryName)
     local blip = AddBlipForRadius(Config.Territories[territoryName].capture.location, Config.Territories[territoryName].radius)

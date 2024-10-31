@@ -2,33 +2,13 @@
 local ESX = exports['es_extended']:getSharedObject()
 local ox_inventory = exports.ox_inventory
 local dbTerritory = {}
-local territoryCount = {}
-local playerInfo = {}
-local captureCooldowns = {}
 
 
-function GetPlayerByGang(targetGangName)
-    local playerSource = nil
-
-    ESX.GetExtendedPlayers(function(player)
-        local xPlayer = ESX.GetPlayerFromId(player.source)
-        
-        -- Check if the player is in the target gang
-        if xPlayer.gang and xPlayer.gang.name == targetGangName then
-            playerSource = xPlayer.source
-            return -- Exit the loop as soon as a match is found
-        end
-    end)
-
-    return playerSource
-end
-
--- Event to update player counts
 RegisterServerEvent('eth-territories:UpdatePlayerCount')
 AddEventHandler('eth-territories:UpdatePlayerCount', function(data)
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
-    local PlayerGang = exports['eth-gangs']:SVGetPlayerGang(src)
+    local PlayerGang = exports['eth-territories']:SVGetPlayerGang(src)
     local territory = data.zone
     local counts = data.counts
     if not PlayerGang and PlayerGang == "none" then return end
@@ -53,11 +33,11 @@ function updateTerritory(territoryName, gangName)
     local src = source 
     local xPlayer = ESX.GetPlayerFromId(src)
     if dbTerritory[territoryName] then
-        local gangNameLabel = exports['eth-gangs']:SVGetGangLabel(gangName)
+        local gangNameLabel = exports['eth-territories']:SVGetGangLabel(gangName)
         local location = Config.Territories[territoryName].label
         local message = string.format("%s has captured %s", gangNameLabel, location)
         dbTerritory[territoryName].gang = gangName
-        TriggerClientEvent('eth-gangs:WeazelNews', -1, 'Turf Underattack', message, 5)
+        TriggerClientEvent('eth-territories:WeazelNews', -1, 'Turf Underattack', message, 5)
         exports.oxmysql:update(
             'UPDATE territories SET gang = ? WHERE name = ?',
             {gangName, territoryName}
@@ -78,21 +58,21 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
     local currentTime = os.time()
 
     if (currentTime - Config.Territories[name]['capture']['lastCaptureTime']) < Config.CaptureCooldown and Config.Territories[name]['capture']['lastCaptureTime'] ~= 0 then -- 14400 seconds = 4 hours
-        TriggerClientEvent('esx:showNotification', xPlayer.source, 'error', 5000, 'This territory is on cooldown. Please wait before trying to capture it again.')
+        TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'error', 5000, 'This territory is on cooldown. Please wait before trying to capture it again.')
         return
     end
 
     if playerGangName == "none" then
-        TriggerClientEvent('esx:showNotification', xPlayer.source, 'error', 5000, 'You need to be in a gang to be able to capture the territory.')
+        TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'error', 5000, 'You need to be in a gang to be able to capture the territory.')
         return
     end
 
     if dbTerritory[name] ~= nil then
         if (dbTerritory[name].gang == playerGangName) then
-            TriggerClientEvent('esx:showNotification', xPlayer.source, 'error', 5000, 'You already own this territory')
+            TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'error', 5000, 'You already own this territory')
             return
         elseif (dbTerritory[name].capturing) then
-            TriggerClientEvent('esx:showNotification', xPlayer.source, 'error', 5000, 'This area is already under an attempted claim.')
+            TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'error', 5000, 'This area is already under an attempted claim.')
             return
         end
     
@@ -102,7 +82,7 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
         local location =  Config.Territories[name].label
         local message = gangName .. " has begun the capture of " .. location
 
-        TriggerClientEvent('eth-gangs:WeazelNews', -1, 'Turf Underattack', message, 10)
+        TriggerClientEvent('eth-territories:WeazelNews', -1, 'Turf Underattack', message, 10)
 
         TriggerClientEvent('eth-territories:Capture' , src)
         TriggerClientEvent('eth-territories:GlobalBlipAlert', -1 , name)
@@ -112,14 +92,14 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
             local TurfOwnerCount = dbTerritory[name].playerCounts[dbTerritory[name].gang] or 0
             print("TurfOwnerCount" , TurfOwnerCount)
             if CapturersCount > TurfOwnerCount then
-                TriggerClientEvent('esx:showNotification', xPlayer.source, 'success', 5000, 'You have successfully captured ' .. Config.Territories[name].label)
+                TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'success', 5000, 'You have successfully captured ' .. Config.Territories[name].label)
                 TriggerClientEvent('eth-territories:updateMap', -1 , name , playerGangName)
                 updateTerritory(name,playerGangName)
                 dbTerritory[name].capturing = false
                 TurfRewards(name,playerGangName)
             else
                 local message = gangName .. " has failed capturing " .. location
-                TriggerClientEvent('eth-gangs:WeazelNews', -1, 'Turf Underattack',  message, 5)
+                TriggerClientEvent('eth-territories:WeazelNews', -1, 'Turf Underattack',  message, 5)
                 dbTerritory[name].capturing = false
                 TurfRewards(name,dbTerritory[name].gang)
             end
@@ -185,7 +165,7 @@ end)
 AddEventHandler('playerDropped', function(reason)
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
-    local PlayerGang = exports['eth-gangs']:SVGetPlayerGang(src)
+    local PlayerGang = exports['eth-territories']:SVGetPlayerGang(src)
 
     if not PlayerGang or PlayerGang == "none" then return end
 

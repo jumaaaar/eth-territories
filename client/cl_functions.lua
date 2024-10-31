@@ -31,7 +31,6 @@ end)
 
 function GlobalBlipAlert(territoryName)
     local blip = AddBlipForRadius(Config.Territories[territoryName].capture.location, Config.Territories[territoryName].radius)
-    print(Config.Territories[territoryName].capture.location)
     SetBlipSprite(blip, 9)
     SetBlipDisplay(blip, 4)
     SetBlipColour(blip, 1)

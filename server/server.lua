@@ -33,7 +33,7 @@ function updateTerritory(territoryName, gangName)
     local src = source 
     local xPlayer = ESX.GetPlayerFromId(src)
     if dbTerritory[territoryName] then
-        local gangNameLabel = exports['eth-territories']:SVGetGangLabel(gangName)
+        local gangNameLabel = GetGangLabel(gangName)
         local location = Config.Territories[territoryName].label
         local message = string.format("%s has captured %s", gangNameLabel, location)
         dbTerritory[territoryName].gang = gangName
@@ -50,7 +50,6 @@ end
 
 RegisterServerEvent('eth-territories:CaptureStart')
 AddEventHandler('eth-territories:CaptureStart', function(name)
-    print(name)
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
     local playerGangName = GetPlayerGang(src)
@@ -88,9 +87,7 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
         TriggerClientEvent('eth-territories:GlobalBlipAlert', -1 , name)
         ESX.SetTimeout(Config.Territories[name].capture.captureTime * 60000, function()
             local CapturersCount =  dbTerritory[name].playerCounts[playerGangName] or 0
-            print("capturers count" , CapturersCount)
             local TurfOwnerCount = dbTerritory[name].playerCounts[dbTerritory[name].gang] or 0
-            print("TurfOwnerCount" , TurfOwnerCount)
             if CapturersCount > TurfOwnerCount then
                 TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'success', 5000, 'You have successfully captured ' .. Config.Territories[name].label)
                 TriggerClientEvent('eth-territories:updateMap', -1 , name , playerGangName)

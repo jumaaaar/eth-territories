@@ -1,17 +1,16 @@
 Config = {}
 
 Config.CaptureCooldown = 14400 --- 4 hours
-Config.TurfOwnersOnline = 0
 Config.Territories = {
     BURRITO = {
         label = "EL Burrito Heights",
         washzone = false,
         radius = 100.00,
-        RewardMoney = 0,
+        RewardMoney = 300000,
         capture = { 
             location = vec3(1636.42, -1884.43, 106.52),
             lastCaptureTime  = 0, --- 4 hours
-            captureTime = 0.1 -- minutes.
+            captureTime = 0.2 -- minutes.
         },
         CollectZones = {
         }

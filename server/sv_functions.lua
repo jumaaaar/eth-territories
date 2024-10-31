@@ -26,7 +26,7 @@ function TurfRewards(turf,playerGangName)
     local src = source
     --- ADD ANY REWARDSS YOU WANT
     if Config.Territories[turf].RewardMoney ~= 0 then
-        exports['eth-gangs']:SVAddGangFunds(playerGangName,Config.Territories[name].RewardMoney)
+        exports['eth-gangs']:SVAddGangFunds(playerGangName,Config.Territories[turf].RewardMoney)
     end
 end
 

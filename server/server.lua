@@ -8,7 +8,7 @@ RegisterServerEvent('eth-territories:UpdatePlayerCount')
 AddEventHandler('eth-territories:UpdatePlayerCount', function(data)
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
-    local PlayerGang = exports['eth-territories']:SVGetPlayerGang(src)
+    local PlayerGang = GetPlayerGang(src)
     local territory = data.zone
     local counts = data.counts
     if not PlayerGang and PlayerGang == "none" then return end
@@ -165,7 +165,7 @@ end)
 AddEventHandler('playerDropped', function(reason)
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
-    local PlayerGang = exports['eth-territories']:SVGetPlayerGang(src)
+    local PlayerGang = GetPlayerGang(src)
 
     if not PlayerGang or PlayerGang == "none" then return end
 

@@ -68,8 +68,7 @@ function CreateMapBlips()
             BeginTextCommandSetBlipName("STRING")
             AddTextComponentString(v['label'])
             EndTextCommandSetBlipName(blip)
-
-            print(GetGangBlipColor(gang))
+            
             if gang then
                 SetBlipColour(radiusBlip, GetGangBlipColor(gang))
             else

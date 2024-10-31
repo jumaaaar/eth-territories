@@ -12,6 +12,10 @@ function GetGangBlipColor(playerGang)
     return 0
 end
 
+RegisterNetEvent('eth-gangs:WeazelNews', function(title, message, duration)
+	ESX.Scaleform.ShowBreakingNews(title, message, bottom, duration)
+end)
+
 function Notification(label, msg, duration, type)
     exports['cfx-hu-notify']:Custom({style = type, duration = duration, title = label, message = msg, sound = false})
 end

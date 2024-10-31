@@ -1,6 +1,5 @@
 Config = {}
 
-Config.BlacklistedJobs = { police = {}, ambulance = {}, mechanic = {} } -- These jobs are unable to start the capture of areas.
 Config.CaptureCooldown = 14400 --- 4 hours
 Config.TurfOwnersOnline = 0
 Config.Territories = {
@@ -12,7 +11,7 @@ Config.Territories = {
         capture = { 
             location = vec3(1636.42, -1884.43, 106.52),
             lastCaptureTime  = 0, --- 4 hours
-            captureTime = 0.5 -- minutes.
+            captureTime = 0.1 -- minutes.
         },
         CollectZones = {
         }
@@ -75,9 +74,5 @@ Config.Territories = {
 
 
 Config.Gangs = {
-    elite = { color = 4},
-    ssc = {color = 38},
-    celes = {  color = 40},
-    mafia867 = { color = 8},
-
+    santo = { color = 3},
 }

@@ -57,7 +57,7 @@ function updateTerritory(territoryName, gangName)
         local location = Config.Territories[territoryName].label
         local message = string.format("%s has captured %s", gangNameLabel, location)
         dbTerritory[territoryName].gang = gangName
-        TriggerClientEvent('esx:Custom:WeazelNews', -1, 'Turf Underattack', message, 5)
+        TriggerClientEvent('eth-gangs:WeazelNews', -1, 'Turf Underattack', message, 5)
         exports.oxmysql:update(
             'UPDATE territories SET gang = ? WHERE name = ?',
             {gangName, territoryName}
@@ -70,6 +70,7 @@ end
 
 RegisterServerEvent('eth-territories:CaptureStart')
 AddEventHandler('eth-territories:CaptureStart', function(name)
+    print(name)
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
     local playerGangName = GetPlayerGang(src)
@@ -80,7 +81,6 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
         TriggerClientEvent('esx:showNotification', xPlayer.source, 'error', 5000, 'This territory is on cooldown. Please wait before trying to capture it again.')
         return
     end
-
 
     if playerGangName == "none" then
         TriggerClientEvent('esx:showNotification', xPlayer.source, 'error', 5000, 'You need to be in a gang to be able to capture the territory.')
@@ -102,7 +102,7 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
         local location =  Config.Territories[name].label
         local message = gangName .. " has begun the capture of " .. location
 
-        TriggerClientEvent('esx:Custom:WeazelNews', -1, 'Turf Underattack', message, 10)
+        TriggerClientEvent('eth-gangs:WeazelNews', -1, 'Turf Underattack', message, 10)
 
         TriggerClientEvent('eth-territories:Capture' , src)
         TriggerClientEvent('eth-territories:GlobalBlipAlert', -1 , name)
@@ -119,7 +119,7 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
                 TurfRewards(name,playerGangName)
             else
                 local message = gangName .. " has failed capturing " .. location
-                TriggerClientEvent('esx:Custom:WeazelNews', -1, 'Turf Underattack',  message, 5)
+                TriggerClientEvent('eth-gangs:WeazelNews', -1, 'Turf Underattack',  message, 5)
                 dbTerritory[name].capturing = false
                 TurfRewards(name,dbTerritory[name].gang)
             end

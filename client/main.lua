@@ -24,30 +24,39 @@ AddEventHandler('esx:setGang', function(gang, gang_rank)
 end)
 
 RegisterNetEvent('eth-territories:Capture')
-AddEventHandler('eth-territories:Capture', function(data)
-    local territoryCfg = Config.Territories[closestTerritory]
+AddEventHandler('eth-territories:Capture', function(territory)
+    local territoryCfg = Config.Territories[territory]
     local captureDuration = territoryCfg.capture.captureTime * 60000
+    local territoryName = territoryCfg.label or "Unknown Territory"
 
     CreateThread(function()
         while captureDuration > 0 do
             Wait(1000)
-
-            captureDuration = captureDuration - 1000 
-
-            local secondsRemaining = math.floor(captureDuration / 1000)
-            lib.showTextUI('Capturing... ' .. secondsRemaining .. ' seconds remaining', {
-                position = "left-center",
-                icon = 'fa-regular fa-clock',
-                style = {
-                    borderRadius = 5,
-                    backgroundColor = '#212121',
-                    color = 'white'
-                }
-            })
+            captureDuration = captureDuration - 1000
         end
-        lib.hideTextUI()
+    end)
+
+    CreateThread(function()
+        while captureDuration > 0 do
+            Wait(0) -- Keep drawing every frame
+            local secondsRemaining = math.floor(captureDuration / 1000)
+            DrawTopScreenText('~b~' .. territoryName .. ': ~r~' .. secondsRemaining .. '~w~ seconds remaining before capture')
+        end
     end)
 end)
+
+-- Function to draw text at the top center of the screen
+function DrawTopScreenText(text)
+    SetTextFont(4)
+    SetTextProportional(1)
+    SetTextScale(0.5, 0.5)
+    SetTextColour(255, 255, 255, 255)
+    SetTextCentre(true)
+    SetTextEntry("STRING")
+    AddTextComponentString(text)
+    DrawText(0.5, 0.05)  -- 0.5 centers horizontally, 0.05 positions it near the top
+end
+
 
 function GetBlipFromZone(zone)
     return blipTable[zone] 

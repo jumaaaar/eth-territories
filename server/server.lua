@@ -88,7 +88,7 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
 
         TriggerClientEvent('eth-territories:WeazelNews', -1, 'Turf Underattack', message, 10)
 
-        TriggerClientEvent('eth-territories:Capture', src)
+        TriggerClientEvent('eth-territories:Capture', -1 , name)
         TriggerClientEvent('eth-territories:GlobalBlipAlert', -1, name)
 
         -- Capture process using player counts from dbTerritory

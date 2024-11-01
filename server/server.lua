@@ -1,7 +1,8 @@
 
 local ESX = exports['es_extended']:getSharedObject()
 local ox_inventory = exports.ox_inventory
-local dbTerritory = {}
+local dbTerritory = {
+}
 
 
 RegisterServerEvent('eth-territories:UpdatePlayerCount')
@@ -19,8 +20,9 @@ AddEventHandler('eth-territories:UpdatePlayerCount', function(data)
 
     if not dbTerritory[territory].playerCounts[PlayerGang] then
         dbTerritory[territory].playerCounts[PlayerGang] = 0
+
     end
-    
+
     dbTerritory[territory].playerCounts[PlayerGang] = dbTerritory[territory].playerCounts[PlayerGang] + counts
 
     print(string.format("Updated player counts for territory %s: %s", territory, json.encode(dbTerritory[territory].playerCounts)))
@@ -56,50 +58,61 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
 
     local currentTime = os.time()
 
-    if (currentTime - Config.Territories[name]['capture']['lastCaptureTime']) < Config.CaptureCooldown and Config.Territories[name]['capture']['lastCaptureTime'] ~= 0 then -- 14400 seconds = 4 hours
+    -- Notify if the territory is on cooldown
+    if (currentTime - Config.Territories[name]['capture']['lastCaptureTime']) < Config.CaptureCooldown and Config.Territories[name]['capture']['lastCaptureTime'] ~= 0 then
         TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'error', 5000, 'This territory is on cooldown. Please wait before trying to capture it again.')
         return
     end
 
+    -- Check if the player is in a gang
     if playerGangName == "none" then
         TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'error', 5000, 'You need to be in a gang to be able to capture the territory.')
         return
     end
 
+    -- Check if the territory is already being captured
     if dbTerritory[name] ~= nil then
-        if (dbTerritory[name].gang == playerGangName) then
-            TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'error', 5000, 'You already own this territory')
-            return
-        elseif (dbTerritory[name].capturing) then
+        if (dbTerritory[name].capturing) then
             TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'error', 5000, 'This area is already under an attempted claim.')
             return
         end
-    
+
         dbTerritory[name].capturing = true
-    
+
         local gangName = GetGangLabel(playerGangName)
-        local location =  Config.Territories[name].label
+        local location = Config.Territories[name].label
         local message = gangName .. " has begun the capture of " .. location
 
         TriggerClientEvent('eth-territories:WeazelNews', -1, 'Turf Underattack', message, 10)
 
-        TriggerClientEvent('eth-territories:Capture' , src)
-        TriggerClientEvent('eth-territories:GlobalBlipAlert', -1 , name)
+        TriggerClientEvent('eth-territories:Capture', src)
+        TriggerClientEvent('eth-territories:GlobalBlipAlert', -1, name)
+
+        -- Capture process using player counts from dbTerritory
         ESX.SetTimeout(Config.Territories[name].capture.captureTime * 60000, function()
-            local CapturersCount =  dbTerritory[name].playerCounts[playerGangName] or 0
-            local TurfOwnerCount = dbTerritory[name].playerCounts[dbTerritory[name].gang] or 0
-            if CapturersCount > TurfOwnerCount then
-                TriggerClientEvent('eth-territories:Notify', xPlayer.source, 'success', 5000, 'You have successfully captured ' .. Config.Territories[name].label)
-                TriggerClientEvent('eth-territories:updateMap', -1 , name , playerGangName)
-                updateTerritory(name,playerGangName)
-                dbTerritory[name].capturing = false
-                TurfRewards(name,playerGangName)
-            else
-                local message = gangName .. " has failed capturing " .. location
-                TriggerClientEvent('eth-territories:WeazelNews', -1, 'Turf Underattack',  message, 5)
-                dbTerritory[name].capturing = false
-                TurfRewards(name,dbTerritory[name].gang)
+            local highestGang = nil
+            local highestCount = 0
+
+            -- Check player counts for all gangs in the territory
+            for gang, count in pairs(dbTerritory[name].playerCounts) do
+                if count > highestCount then
+                    highestCount = count
+                    highestGang = gang
+                end
             end
+
+            -- Determine if the capturing gang is the highest
+           -- if highestGang == playerGangName then
+                TriggerClientEvent('eth-territories:updateMap', -1, name, highestGang)
+                updateTerritory(name, highestGang)
+                TurfRewards(name, highestGang)
+            -- else
+            --     local turfOwnerName = dbTerritory[name].gang
+            --     local message = gangName .. " has failed capturing " .. location .. ". " .. GetGangLabel(highestGang) .. " retains ownership with " .. highestCount .. " members."
+            --     TriggerClientEvent('eth-territories:WeazelNews', -1, 'Turf Underattack', message, 5)
+            --     TurfRewards(name, turfOwnerName)
+            -- end
+
             dbTerritory[name].capturing = false
             Config.Territories[name]['capture']['lastCaptureTime'] = os.time()
         end)

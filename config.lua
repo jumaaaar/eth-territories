@@ -74,4 +74,6 @@ Config.Territories = {
 
 Config.Gangs = {
     santo = { color = 3},
+    geng = { color = 9},
+    geng2 = { color = 8},
 }

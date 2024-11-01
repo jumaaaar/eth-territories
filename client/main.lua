@@ -103,12 +103,15 @@ function CreateMapBlips()
                 radius = v.radius or 100.0,
                 debug = true,
                 inside = function()
-                    local playerPed = PlayerPedId()
 
-                    if IsPedInAnyVehicle(playerPed, false) then
-                        kickOutOfVehicle()
-                        return
+                    if Config.BlockVehicleInTerritory then
+                        local playerPed = PlayerPedId()
+                        if IsPedInAnyVehicle(playerPed, false) then
+                            kickOutOfVehicle()
+                            return
+                        end
                     end
+                    
                     if not isInsideZone then
                         isInsideZone = true
                         lib.showTextUI(v.label .. " Territory", { position = 'right-center' })

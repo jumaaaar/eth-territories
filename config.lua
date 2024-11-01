@@ -1,6 +1,7 @@
 Config = {}
 
 Config.CaptureCooldown = 14400 --- 4 hours
+Config.BlockVehicleInTerritory = true
 Config.Territories = {
     BURRITO = {
         label = "EL Burrito Heights",

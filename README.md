@@ -12,7 +12,7 @@ Enhance your server with a dynamic Turf War system! This script integrates seaml
 * Dynamic Gang Defense System: Territories track the number of gang members within, with the largest gang presence controlling the turf if already owned. You can customize how gangs will receive rewards in sv_functions.lua.
 * Free-for-All Capture Mode: When a territory capture is triggered, any gang can join the conflict. There are no restrictions on gang participation, allowing for intense battles for control.
 * Winner Determination: The winner of the territory will be based on which gang has the most members inside the zone at the end of the capture event. This dynamic encourages collaboration and strategy among gang members.
-* Vehicle Restrictions: Vehicles are not allowed within the territory during capture attempts. If a player enters the territory while in a vehicle, they will be automatically kicked out to ensure fairness and maintain the competitive environment.
+* Vehicle Restrictions: Vehicles are not allowed within the territory during capture attempts. If a player enters the territory while in a vehicle, they will be automatically kicked out to ensure fairness and maintain the competitive environment. (You can disable this on config)
 
 
 # Installation

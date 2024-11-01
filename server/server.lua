@@ -21,8 +21,11 @@ AddEventHandler('eth-territories:UpdatePlayerCount', function(data)
     if not dbTerritory[territory].playerCounts[PlayerGang] then
         dbTerritory[territory].playerCounts[PlayerGang] = 0
 
+        if dbTerritory[territory].capturing then
+            local msg = GetGangLabel(PlayerGang) .. " has Joined the war at " ..Config.Territories[territory].label
+            TriggerClientEvent('eth-territories:Notify', -1 , "info", 10000, msg)
+        end
     end
-
     dbTerritory[territory].playerCounts[PlayerGang] = dbTerritory[territory].playerCounts[PlayerGang] + counts
 
     print(string.format("Updated player counts for territory %s: %s", territory, json.encode(dbTerritory[territory].playerCounts)))

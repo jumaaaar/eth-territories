@@ -85,23 +85,13 @@ function CreateMapBlips()
                 inside = function()
                     if not isInsideZone then
                         isInsideZone = true
-                        lib.showTextUI("[E] Capture " .. v.label .. " Territory", { position = 'right-center' })
+                        lib.showTextUI(v.label .. " Territory", { position = 'right-center' })
                         playerCounts = 1
                         closestTerritory = k
                         TriggerServerEvent('eth-territories:UpdatePlayerCount', {
                             zone = k,
                             counts = playerCounts
                         })
-                        Citizen.CreateThread(function()
-                            while isInsideZone do
-                                Citizen.Wait(0) 
-                                if IsControlJustPressed(0, 38) then 
-                                    TriggerServerEvent('eth-territories:CaptureStart' , k)
-                                    lib.hideTextUI()
-                                    break
-                                end
-                            end
-                        end)
                     end
                 end,
                 onExit = function()
@@ -128,6 +118,44 @@ function GetClosestTerritory()
 end
 exports('GetClosestTerritory' , GetClosestTerritory)
 
+
+
+RegisterCommand("turds", function()
+    TriggerServerEvent('eth-territories:CaptureStart' , "BURRITO")
+end)
+local captureLimit = 0
+
+CreateThread(function()
+	while true do
+		local sleep = 500
+		local ped = PlayerPedId()
+		local coords = GetEntityCoords(ped)
+		for k, v in pairs(Config.Territories) do
+			local dist = #(coords - v['capture']['location'])
+			if dist <= 1.0 then
+					sleep = 0
+					ESX.DrawText3D(v['capture']['location'].x, v['capture']['location'].y, v['capture']['location'].z, '[~b~E~w~] ' ..'Capture '..v.label)
+					if IsControlJustReleased(0, 38) then
+						if (GetGameTimer() - captureLimit) < 3000 then 
+							Notification('RATE LIMIT', 'You must wait '..(3 - math.floor((GetGameTimer() - captureLimit) / 1000))..' seconds' , 5000, 'error')
+						else
+                            if (not IsPedArmed(PlayerPedId(), 4)) then
+                                Notification("TERRITORIES", 'You must have a firearm to begin the capture.', 5000 ,'error')
+                            else
+                                TriggerServerEvent('eth-territories:CaptureStart' , closestTerritory)
+                            end
+
+						end
+						captureLimit = GetGameTimer()
+					end
+			elseif dist <= 5.0 then
+				sleep = 0
+				ESX.DrawMarker(v['capture']['location'], 255, 255, 255, 150)
+			end 
+		end
+		Wait(sleep)
+	end
+end)
 
 
 RegisterNetEvent('eth-territories:GlobalBlipAlert')

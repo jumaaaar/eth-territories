@@ -96,26 +96,15 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
             local highestGang = nil
             local highestCount = 0
 
-            -- Check player counts for all gangs in the territory
             for gang, count in pairs(dbTerritory[name].playerCounts) do
                 if count > highestCount then
                     highestCount = count
                     highestGang = gang
                 end
             end
-
-            -- Determine if the capturing gang is the highest
-           -- if highestGang == playerGangName then
-                TriggerClientEvent('eth-territories:updateMap', -1, name, highestGang)
-                updateTerritory(name, highestGang)
-                TurfRewards(name, highestGang)
-            -- else
-            --     local turfOwnerName = dbTerritory[name].gang
-            --     local message = gangName .. " has failed capturing " .. location .. ". " .. GetGangLabel(highestGang) .. " retains ownership with " .. highestCount .. " members."
-            --     TriggerClientEvent('eth-territories:WeazelNews', -1, 'Turf Underattack', message, 5)
-            --     TurfRewards(name, turfOwnerName)
-            -- end
-
+            TriggerClientEvent('eth-territories:updateMap', -1, name, highestGang)
+            updateTerritory(name, highestGang)
+            TurfRewards(name, highestGang)
             dbTerritory[name].capturing = false
             Config.Territories[name]['capture']['lastCaptureTime'] = os.time()
         end)

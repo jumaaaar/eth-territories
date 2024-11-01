@@ -45,7 +45,7 @@ AddEventHandler('eth-territories:Capture', function(territory)
     end)
 end)
 
--- Function to draw text at the top center of the screen
+
 function DrawTopScreenText(text)
     SetTextFont(4)
     SetTextProportional(1)
@@ -54,7 +54,7 @@ function DrawTopScreenText(text)
     SetTextCentre(true)
     SetTextEntry("STRING")
     AddTextComponentString(text)
-    DrawText(0.5, 0.05)  -- 0.5 centers horizontally, 0.05 positions it near the top
+    DrawText(0.5, 0.05) 
 end
 
 
@@ -87,11 +87,28 @@ function CreateMapBlips()
             SetBlipAlpha(radiusBlip, 128)
 
             local isInsideZone = false
+
+            local function kickOutOfVehicle()
+                local playerPed = PlayerPedId()
+                local playerVehicle = GetVehiclePedIsIn(playerPed, false)
+                
+                -- If the player is in a vehicle, kick them out
+                if playerVehicle and playerVehicle ~= 0 then
+                    TaskLeaveVehicle(playerPed, playerVehicle, 0)
+                end
+            end
+
             local territoryZone = lib.zones.sphere({
                 coords = v.capture.location,
                 radius = v.radius or 100.0,
-                debug = false,
+                debug = true,
                 inside = function()
+                    local playerPed = PlayerPedId()
+
+                    if IsPedInAnyVehicle(playerPed, false) then
+                        kickOutOfVehicle()
+                        return
+                    end
                     if not isInsideZone then
                         isInsideZone = true
                         lib.showTextUI(v.label .. " Territory", { position = 'right-center' })

@@ -21,6 +21,6 @@ Enhance your server with a dynamic Turf War system! This script integrates seaml
 3. Server Configuration: Add start eth-territories to your server.cfg file.
 4. Launch: Start your server to load the new Turf War system.
 
-# [SHOWCASE](https://www.youtube.com/watch?v=s-kTywBlCdA)
+# [SHOWCASE](https://youtu.be/5TWSEIouysA)
 
 With this script, players can battle for territory control and enjoy exciting turf-based rewards. Enjoy!

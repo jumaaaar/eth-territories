@@ -42,7 +42,8 @@ function updateTerritory(territoryName, gangName)
         local location = Config.Territories[territoryName].label
         local message = string.format("%s has captured %s", gangNameLabel, location)
         dbTerritory[territoryName].gang = gangName
-        TriggerClientEvent('eth-territories:WeazelNews', -1, 'Turf Underattack', message, 5)
+
+        TriggerClientEvent('eth-territories:Notify', -1 , "info", 10000, message)
         exports.oxmysql:update(
             'UPDATE territories SET gang = ? WHERE name = ?',
             {gangName, territoryName}
@@ -86,7 +87,7 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
         local location = Config.Territories[name].label
         local message = gangName .. " has begun the capture of " .. location
 
-        TriggerClientEvent('eth-territories:WeazelNews', -1, 'Turf Underattack', message, 10)
+        TriggerClientEvent('eth-territories:Notify', -1 , "info", 10000, message)
 
         TriggerClientEvent('eth-territories:Capture', -1 , name)
         TriggerClientEvent('eth-territories:GlobalBlipAlert', -1, name)

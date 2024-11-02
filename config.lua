@@ -1,6 +1,7 @@
 Config = {}
 
 Config.CaptureCooldown = 14400 --- 4 hours
+Config.DebugSphereZone = true --- set debug to true (red sphere)
 Config.BlockVehicleInTerritory = true
 Config.Territories = {
     BURRITO = {

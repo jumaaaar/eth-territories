@@ -101,7 +101,7 @@ function CreateMapBlips()
             local territoryZone = lib.zones.sphere({
                 coords = v.capture.location,
                 radius = v.radius or 100.0,
-                debug = true,
+                debug = Config.DebugSphereZone,
                 inside = function()
 
                     if Config.BlockVehicleInTerritory then

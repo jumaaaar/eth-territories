@@ -152,40 +152,62 @@ exports('GetClosestTerritory' , GetClosestTerritory)
 RegisterCommand("turds", function()
     TriggerServerEvent('eth-territories:CaptureStart' , "BURRITO")
 end)
+
+
 local captureLimit = 0
 
+
+function DrawText3D(x, y, z, text)
+    SetDrawOrigin(x, y, z, 0)
+    SetTextFont(4)
+    SetTextProportional(1)
+    SetTextScale(0.35, 0.35)
+    SetTextColour(255, 255, 255, 215)
+    SetTextEntry("STRING")
+    SetTextCentre(1)
+    AddTextComponentString(text)
+    DrawText(0.0, 0.0)
+    ClearDrawOrigin()
+end
+
+
+function DrawMarkerAtLocation(coords, r, g, b, a)
+    DrawMarker(1, coords.x, coords.y, coords.z - 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, r, g, b, a, false, false, 2, false, nil, nil, false)
+end
+
 CreateThread(function()
-	while true do
-		local sleep = 500
-		local ped = PlayerPedId()
-		local coords = GetEntityCoords(ped)
-		for k, v in pairs(Config.Territories) do
-			local dist = #(coords - v['capture']['location'])
-			if dist <= 1.0 then
-					sleep = 0
-					ESX.DrawText3D(v['capture']['location'].x, v['capture']['location'].y, v['capture']['location'].z, '[~b~E~w~] ' ..'Capture '..v.label)
-					if IsControlJustReleased(0, 38) then
-						if (GetGameTimer() - captureLimit) < 3000 then 
-							Notification('RATE LIMIT', 'You must wait '..(3 - math.floor((GetGameTimer() - captureLimit) / 1000))..' seconds' , 5000, 'error')
-						else
-                            if (not IsPedArmed(PlayerPedId(), 4)) then
-                                Notification("TERRITORIES", 'You must have a firearm to begin the capture.', 5000 ,'error')
-                            else
-                                TriggerServerEvent('eth-territories:CaptureStart' , closestTerritory)
-                            end
-
-						end
-						captureLimit = GetGameTimer()
-					end
-			elseif dist <= 5.0 then
-				sleep = 0
-				ESX.DrawMarker(v['capture']['location'], 255, 255, 255, 150)
-			end 
-		end
-		Wait(sleep)
-	end
+    while true do
+        local sleep = 500
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+        
+        for k, v in pairs(Config.Territories) do
+            local dist = #(coords - v['capture']['location'])
+            
+            if dist <= 1.0 then
+                sleep = 0
+                DrawText3D(v['capture']['location'].x, v['capture']['location'].y, v['capture']['location'].z, '[~b~E~w~] Capture ' .. v.label)
+                
+                if IsControlJustReleased(0, 38) then
+                    if (GetGameTimer() - captureLimit) < 3000 then
+                        Notification('RATE LIMIT', 'You must wait ' .. (3 - math.floor((GetGameTimer() - captureLimit) / 1000)) .. ' seconds', 5000, 'error')
+                    else
+                        if not IsPedArmed(PlayerPedId(), 4) then
+                            Notification("TERRITORIES", 'You must have a firearm to begin the capture.', 5000, 'error')
+                        else
+                            TriggerServerEvent('eth-territories:CaptureStart', closestTerritory)
+                        end
+                    end
+                    captureLimit = GetGameTimer()
+                end
+            elseif dist <= 5.0 then
+                sleep = 0
+                DrawMarkerAtLocation(v['capture']['location'], 255, 255, 255, 150)
+            end
+        end
+        Wait(sleep)
+    end
 end)
-
 
 RegisterNetEvent('eth-territories:GlobalBlipAlert')
 AddEventHandler('eth-territories:GlobalBlipAlert', GlobalBlipAlert)

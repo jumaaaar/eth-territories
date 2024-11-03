@@ -103,9 +103,16 @@ AddEventHandler('eth-territories:CaptureStart', function(name)
                     highestGang = gang
                 end
             end
-            TriggerClientEvent('eth-territories:updateMap', -1, name, highestGang)
-            updateTerritory(name, highestGang)
-            TurfRewards(name, highestGang)
+
+            if highestGang ~= nil then
+                TriggerClientEvent('eth-territories:updateMap', -1, name, highestGang)
+                updateTerritory(name, highestGang)
+                TurfRewards(name, highestGang)
+            else
+                local message = "No one was successfull capturing " ..location
+
+                TriggerClientEvent('eth-territories:Notify', -1 , "info", 10000, message)
+            end
             dbTerritory[name].capturing = false
             Config.Territories[name]['capture']['lastCaptureTime'] = os.time()
         end)
